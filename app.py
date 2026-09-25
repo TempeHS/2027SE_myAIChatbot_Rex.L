@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from chatterbot import ChatBot
 from chatterbot.trainers import ChatterBotCorpusTrainer, ListTrainer
+import re
 
 # Create the Flask application
 app = Flask(__name__)
@@ -77,16 +78,36 @@ def home():
     return render_template("index.html")
 
 
+def sanitise_input(message):
+    if not message:
+        return None
+
+    message = message.strip()
+
+    if not message:
+        return None
+
+    message = re.sub(r"<[^>]+>", "", message)
+
+    if len(message) > 500:
+        return None
+
+    return message
+
+
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
-    user_message = data.get("message", "")
+    raw_message = data.get("message", "")
+    user_message = sanitise_input(raw_message)
 
-    if not user_message:
-        return jsonify({"response": "Please enter a message!"})
-
-    if len(user_message) > 500:
-        return jsonify({"response": "Message too long!"})
+    if user_message is None:
+        if not raw_message or not raw_message.strip():
+            return jsonify({"response": "Please enter a message!"})
+        else:
+            return jsonify(
+                {"response": "Message too long! Please keep it under 500 characters."}
+            )
 
     # Safety check for crisis keywords
     if check_for_crisis(user_message):
