@@ -32,13 +32,13 @@
         max-width: 80%;
       }
       .user-message {
-        background-color: #09e6c8;
+        background-color: #d3542d;
         color: white;
         margin-left: auto;
       }
       .bot-message {
-        background-color: #370d9b;
-        color: #333;
+        background-color: #b152b1;
+        color: #ffffff;
       }
       .message-time {
         font-size: 0.75rem;
@@ -106,7 +106,6 @@
         e.preventDefault();
 
         const message = messageInput.value.trim();
-        if (!message) return;
 
         // Add user message to chat
         addMessage(message, true);
